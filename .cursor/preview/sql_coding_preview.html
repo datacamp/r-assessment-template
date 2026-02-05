@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Exercise Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Left Panel */
+    .left-panel {
+      width: 420px;
+      background: #16213e;
+      border-right: 1px solid #2a2a4a;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .exercise-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .exercise-label svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .exercise-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+
+    .context {
+      font-size: 15px;
+      color: #b0b0b0;
+      margin-bottom: 24px;
+    }
+
+    .context p {
+      margin-bottom: 12px;
+    }
+
+    .context code {
+      background: #2a2a4a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      color: #14b8a6;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .section-header svg {
+      width: 20px;
+      height: 20px;
+      color: #888;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .xp-badge {
+      background: rgba(20, 184, 166, 0.2);
+      color: #14b8a6;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    .instructions-list {
+      list-style: disc;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #b0b0b0;
+    }
+
+    .instructions-list li {
+      margin-bottom: 8px;
+    }
+
+    .instructions-list code {
+      background: #2a2a4a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #14b8a6;
+    }
+
+    .hint-section {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .hint-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .hint-list {
+      list-style: disc;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #b0b0b0;
+    }
+
+    .hint-list li {
+      margin-bottom: 8px;
+    }
+
+    .hint-list code {
+      background: #2a2a4a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #14b8a6;
+    }
+
+    /* Right Panel */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0f0f23;
+    }
+
+    /* Code Editor Header */
+    .editor-header {
+      display: flex;
+      align-items: center;
+      background: #16213e;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 0 16px;
+    }
+
+    .tab {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: #fff;
+    }
+
+    .tab.active {
+      color: #fff;
+      border-bottom-color: #14b8a6;
+    }
+
+    .editor-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Code Editor */
+    .code-editor {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .code-editor pre {
+      margin: 0;
+      background: transparent !important;
+      padding: 0 !important;
+    }
+
+    .code-editor code {
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d4d4d4;
+    }
+
+    .line-numbers {
+      display: inline-block;
+      width: 30px;
+      color: #555;
+      text-align: right;
+      padding-right: 16px;
+      user-select: none;
+    }
+
+    /* SQL Syntax Highlighting */
+    .comment { color: #6a9955; }
+    .string { color: #ce9178; }
+    .number { color: #b5cea8; }
+    .keyword { color: #569cd6; font-weight: bold; }
+    .function { color: #dcdcaa; }
+    .operator { color: #d4d4d4; }
+    .table { color: #4ec9b0; }
+    .scaffold { 
+      background: #3d3d00;
+      color: #ffff00;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* Editor Footer */
+    .editor-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #16213e;
+      border-top: 1px solid #2a2a4a;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-secondary {
+      background: #2a2a4a;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: #3a3a5a;
+    }
+
+    .btn-primary {
+      background: #14b8a6;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #0d9488;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2a2a4a;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .footer-spacer {
+      flex: 1;
+    }
+
+    /* SQL Console */
+    .shell-container {
+      height: 200px;
+      background: #0f0f23;
+      border-top: 1px solid #2a2a4a;
+    }
+
+    .shell-header {
+      display: flex;
+      background: #16213e;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .shell-tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .shell-tab.active {
+      color: #fff;
+      border-bottom-color: #14b8a6;
+    }
+
+    .shell-content {
+      padding: 16px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .shell-prompt {
+      color: #14b8a6;
+    }
+
+    /* Preview Banner */
+    .preview-banner {
+      background: #ccfbf1;
+      border-bottom: 1px solid #14b8a6;
+      padding: 8px 16px;
+      text-align: center;
+      font-size: 13px;
+      color: #0f766e;
+    }
+
+    .preview-banner strong {
+      font-weight: 600;
+    }
+
+    /* Hidden content */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-banner">
+    <strong>SQL Exercise Preview</strong> — This is a visual preview of how the exercise will appear on DataCamp
+  </div>
+
+  <div class="container">
+    <div class="left-panel">
+      <div class="exercise-label">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+        </svg>
+        SQL Exercise
+      </div>
+
+      <h1 class="exercise-title" id="title">Loading...</h1>
+
+      <div class="context" id="context">
+        Loading...
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="section-title">Instructions</span>
+          <span class="xp-badge" id="xp-badge">0 XP</span>
+        </div>
+        <ul class="instructions-list" id="instructions">
+          <li>Loading...</li>
+        </ul>
+      </div>
+
+      <div class="hint-section">
+        <h3 class="hint-title">Hint</h3>
+        <ul class="hint-list" id="hints">
+          <li>Loading...</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="editor-header">
+        <div class="tab active" id="tab-script" onclick="showTab('script')">script.sql</div>
+        <div class="tab" id="tab-solution" onclick="showTab('solution')">solution.sql</div>
+      </div>
+
+      <div class="code-editor" id="code-editor">
+        <pre><code id="code-content">Loading...</code></pre>
+      </div>
+
+      <div class="editor-footer">
+        <button class="btn-icon" title="Reset">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+        <div class="footer-spacer"></div>
+        <button class="btn btn-secondary">Run Query</button>
+        <button class="btn btn-primary" id="submit-btn">Submit Answer</button>
+      </div>
+
+      <div class="shell-container">
+        <div class="shell-header">
+          <div class="shell-tab active">SQL Console</div>
+          <div class="shell-tab">Query Results</div>
+        </div>
+        <div class="shell-content">
+          <span class="shell-prompt">SQL&gt;</span> <span id="shell-cursor">|</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exercise data will be injected here
+    const EXERCISE_DATA = __EXERCISE_DATA__;
+
+    // Current tab state
+    let currentTab = 'script';
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function highlightSQL(code) {
+      if (!code) return '';
+      
+      // Process line by line to handle comments properly
+      const lines = code.split('\n');
+      return lines.map(line => {
+        // Check if this line has a SQL comment (--)
+        const commentIndex = line.indexOf('--');
+        let codePart = line;
+        let commentPart = '';
+        
+        if (commentIndex !== -1) {
+          codePart = line.substring(0, commentIndex);
+          commentPart = line.substring(commentIndex);
+        }
+        
+        // Escape HTML in code part
+        let html = escapeHtml(codePart);
+        
+        // Highlight scaffolding (3 underscores)
+        html = html.replace(/___/g, '<span class="scaffold">___</span>');
+        
+        // Highlight strings
+        html = html.replace(/'([^']*)'/g, '<span class="string">\'$1\'</span>');
+        
+        // Highlight numbers
+        html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>');
+        
+        // Highlight SQL keywords (must be done carefully to avoid breaking other highlights)
+        const keywords = [
+          'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING',
+          'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN',
+          'ON', 'AS', 'AND', 'OR', 'NOT', 'IN', 'BETWEEN', 'LIKE', 'IS NULL', 'IS NOT NULL',
+          'DISTINCT', 'UNION', 'UNION ALL', 'LIMIT', 'OFFSET', 'INSERT', 'UPDATE', 'DELETE',
+          'CREATE', 'ALTER', 'DROP', 'TABLE', 'INDEX', 'VIEW', 'INTO', 'VALUES', 'SET',
+          'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'NULL', 'TRUE', 'FALSE',
+          'ASC', 'DESC', 'WITH', 'OVER', 'PARTITION BY', 'ROWS', 'RANGE'
+        ];
+        
+        // Sort by length (longest first) to match multi-word keywords first
+        keywords.sort((a, b) => b.length - a.length);
+        
+        keywords.forEach(kw => {
+          const regex = new RegExp(`\\b(${kw})\\b`, 'gi');
+          html = html.replace(regex, (match) => {
+            // Only highlight if it's uppercase or convert to uppercase style
+            return `<span class="keyword">${match.toUpperCase()}</span>`;
+          });
+        });
+        
+        // Highlight SQL functions
+        const functions = [
+          'COUNT', 'SUM', 'AVG', 'MAX', 'MIN', 'ROUND', 'COALESCE', 'NULLIF',
+          'CONCAT', 'SUBSTRING', 'UPPER', 'LOWER', 'TRIM', 'LENGTH', 'REPLACE',
+          'DATE', 'YEAR', 'MONTH', 'DAY', 'NOW', 'CURRENT_DATE', 'CURRENT_TIMESTAMP',
+          'CAST', 'CONVERT', 'ROW_NUMBER', 'RANK', 'DENSE_RANK', 'LAG', 'LEAD',
+          'FIRST_VALUE', 'LAST_VALUE', 'NTH_VALUE'
+        ];
+        
+        functions.forEach(fn => {
+          const regex = new RegExp(`\\b(${fn})\\s*\\(`, 'gi');
+          html = html.replace(regex, (match, p1) => `<span class="function">${p1.toUpperCase()}</span>(`);
+        });
+        
+        // Add escaped comment part
+        if (commentPart) {
+          html += '<span class="comment">' + escapeHtml(commentPart) + '</span>';
+        }
+        
+        return html;
+      }).join('\n');
+    }
+
+    function formatCode(code) {
+      if (!code) return '';
+      const highlightedLines = highlightSQL(code).split('\n');
+      return highlightedLines.map((line, i) => {
+        const lineNum = String(i + 1).padStart(2, ' ');
+        return `<span class="line-numbers">${lineNum}</span>${line}`;
+      }).join('\n');
+    }
+
+    function parseMarkdownInline(text) {
+      // Convert `code` to <code>code</code>
+      return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    function showTab(tab) {
+      currentTab = tab;
+      
+      // Update tab styles
+      document.getElementById('tab-script').classList.toggle('active', tab === 'script');
+      document.getElementById('tab-solution').classList.toggle('active', tab === 'solution');
+      
+      // Update button text
+      document.getElementById('submit-btn').textContent = tab === 'script' ? 'Submit Answer' : 'Run Solution';
+      
+      // Update code content
+      const code = tab === 'script' ? EXERCISE_DATA.sample_code : EXERCISE_DATA.solution;
+      const codeElement = document.getElementById('code-content');
+      codeElement.innerHTML = formatCode(code);
+    }
+
+    function renderExercise() {
+      if (!EXERCISE_DATA) {
+        document.getElementById('title').textContent = 'Error loading exercise';
+        return;
+      }
+
+      // Title
+      document.getElementById('title').textContent = EXERCISE_DATA.title || 'Exercise';
+
+      // XP
+      document.getElementById('xp-badge').textContent = `${EXERCISE_DATA.xp || 100} XP`;
+
+      // Context
+      const contextHtml = EXERCISE_DATA.context
+        .split('\n\n')
+        .filter(p => p.trim())
+        .map(p => `<p>${parseMarkdownInline(p.trim())}</p>`)
+        .join('');
+      document.getElementById('context').innerHTML = contextHtml;
+
+      // Instructions
+      const instructions = EXERCISE_DATA.instructions
+        .split('\n')
+        .map(line => line.replace(/^-\s*/, '').trim())
+        .filter(line => line);
+      document.getElementById('instructions').innerHTML = instructions
+        .map(item => `<li>${parseMarkdownInline(item)}</li>`)
+        .join('');
+
+      // Hints
+      const hints = EXERCISE_DATA.hint
+        .split('\n')
+        .map(line => line.replace(/^-\s*/, '').trim())
+        .filter(line => line);
+      document.getElementById('hints').innerHTML = hints
+        .map(item => `<li>${parseMarkdownInline(item)}</li>`)
+        .join('');
+
+      // Code (sample by default)
+      showTab('script');
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', renderExercise);
+  </script>
+</body>
+</html>
+
