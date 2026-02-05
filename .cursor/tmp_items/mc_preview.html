@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Preview - Data Preparation in Excel</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 {
+            color: #ff6b9d;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #ff6b9d;
+            padding-bottom: 0.5rem;
+        }
+        .pool-info {
+            background: rgba(255, 107, 157, 0.1);
+            border-left: 4px solid #ff6b9d;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 8px 8px 0;
+        }
+        .pool-info code {
+            color: #ff6b9d;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .rotation-info {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #7eb8da;
+        }
+        .item {
+            background: #1e2a3a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #2d3f52;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .item-number {
+            background: #ff6b9d;
+            color: #1a1a2e;
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .item-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .yaml-block {
+            background: #0d1520;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2d3f52;
+            white-space: pre;
+        }
+        .yaml-key { color: #ff6b9d; }
+        .yaml-value { color: #a8e6cf; }
+        .section-label {
+            color: #7eb8da;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .length-status {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(168, 230, 207, 0.2);
+        }
+        .stem-box {
+            background: rgba(126, 184, 218, 0.1);
+            border-left: 3px solid #7eb8da;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #0d1520;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #2d3f52;
+        }
+        .option.correct {
+            background: rgba(168, 230, 207, 0.15);
+            border-color: #a8e6cf;
+        }
+        .option.length-warning {
+            border-color: #ffc107;
+        }
+        .option-num {
+            background: #2d3f52;
+            color: #7eb8da;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .option.correct .option-num {
+            background: #a8e6cf;
+            color: #1a1a2e;
+        }
+        .option-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        .option-length {
+            color: #666;
+            font-size: 0.75rem;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        .option-marker {
+            color: #a8e6cf;
+            font-weight: bold;
+            width: 20px;
+        }
+        .length-warning-text {
+            color: #ffc107;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+        }
+        .references-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .course-ref {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+        }
+        .curated-ref {
+            background: rgba(168, 230, 207, 0.15);
+            border: 1px solid rgba(168, 230, 207, 0.4);
+        }
+        .curated-ref .ref-header {
+            color: #a8e6cf;
+        }
+        .curated-ref .ref-content strong {
+            color: #a8e6cf;
+            font-weight: 600;
+        }
+        .embedded-ref {
+            background: rgba(100, 200, 255, 0.15);
+            border: 1px solid rgba(100, 200, 255, 0.4);
+        }
+        .embedded-ref .ref-header {
+            color: #64c8ff;
+        }
+        .embedded-ref .ref-content {
+            white-space: pre-wrap;
+        }
+        .video-ref {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        .ref-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffc107;
+        }
+        .ref-content {
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .ref-note {
+            font-weight: normal;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .no-refs {
+            color: #666;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 MultipleChoiceChallenge Preview</h1>
+        
+        <div class="pool-info">
+            <strong>Document:</strong> Data Preparation in Excel<br>
+            <strong>Subskill:</strong> <code>data-preparation</code>
+            <div class="stats">
+                <span>📝 15 items</span>
+                <span>🔘 4 options each</span>
+            </div>
+            <div class="rotation-info">
+                <strong>Correct answer positions:</strong> 3 → 2 → 2 → 1 → 1 → 3 → 3 → 2 → 3 → 4 → 3 → 3 → 4 → 4 → 3
+            </div>
+        </div>
+
+        
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 1</span>
+                <h2 class="item-title">Data Preparation Steps</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A marketing analyst receives raw customer data with inconsistent formatting, duplicate entries, and some missing values. Before analyzing purchasing patterns, the analyst needs to prepare the data properly.
+
+What is the primary goal of data preparation in this scenario?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">To create visualizations that communicate purchasing trends clearly</span>
+                    <span class="option-length">67 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">To build formulas that automatically calculate marketing metrics</span>
+                    <span class="option-length">64 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">To ensure the data is clean and accurate for reliable analysis</span>
+                    <span class="option-length">62 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">To share the dataset with colleagues in a standardized format</span>
+                    <span class="option-length">61 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 1.1)</div>
+                <div class="ref-content">&quot;Data preparation involves cleaning, transforming, and organizing any raw <br>  data you will use to perform data analysis. To provide good quality analysis, <br>  you must ensure your data is high quality and &#x27;clean&#x27;. This will ensure that <br>  your final results and outcomes are accurate.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 2</span>
+                <h2 class="item-title">Importing External Data</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A data analyst needs to bring customer information stored in a CSV file into an Excel workbook for further processing. The file contains thousands of records that would be impractical to enter manually.
+
+Where should the analyst navigate to import this CSV file into Excel?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">Navigate to Home menu then Insert section and select Import CSV</span>
+                    <span class="option-length">63 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">Navigate to Data menu then Get &amp; Transform Data and From Text/CSV</span>
+                    <span class="option-length">65 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">Navigate to File menu then Open section and Browse for CSV files</span>
+                    <span class="option-length">64 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">Navigate to Review menu then Data Connections and select New Source</span>
+                    <span class="option-length">67 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 1.2)</div>
+                <div class="ref-content">&quot;To import data into our Excel file, we go to the Data menu, and under the <br>  Get &amp; Transform Data section, we click on From Text/CSV. A new window appears <br>  that allows us to select the file we want to load into the file.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 3</span>
+                <h2 class="item-title">Removing Duplicate Records</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">An inventory manager discovers that the product database contains rows that were accidentally entered multiple times during data entry. Each product should only appear once in the database.
+
+What step should the manager take to address this issue efficiently?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">Sort data alphabetically then manually delete similar rows</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">Use the Remove Duplicates feature found in the Data menu</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">Use Find &amp; Replace to locate and remove matching entries</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">Create a filter and hide rows containing repeated IDs</span>
+                    <span class="option-length">53 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 1.2)</div>
+                <div class="ref-content">&quot;Removing duplicates is an important part of cleaning raw data. Excel has a <br>  feature that lets you do this with great ease. You can identify and select <br>  the columns to remove duplicates from your data.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 4</span>
+                <h2 class="item-title">Using Flash Fill</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A sales coordinator has a column containing full customer names like &quot;Smith, John&quot; and needs to create a separate column showing only the last names. The dataset has over 500 rows.
+
+After manually typing the last name for the first two rows, what feature would automatically complete the remaining cells?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option correct ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">Flash Fill, which detects patterns from the examples provided</span>
+                    <span class="option-length">61 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">AutoComplete, which suggests text based on previous entries</span>
+                    <span class="option-length">59 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">Fill Down, which copies the formula from the cell above</span>
+                    <span class="option-length">55 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">Format Painter, which applies consistent formatting to cells</span>
+                    <span class="option-length">60 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            <div class="length-warning-text">⚠️ Correct answer (61 chars) is longer than all distractors</div>
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 1.2)</div>
+                <div class="ref-content">&quot;So let&#x27;s select a cell in Column D, click on Data at the top, and click <br>  Flash-fill. Flash fill lets you easily fill your data when it senses a <br>  pattern. This works best when there is existing data so that Excel can <br>  identify patterns easier.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 5</span>
+                <h2 class="item-title">Using Fill Series for Dates</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A project manager needs to create a date lookup sheet showing every calendar day from January 1, 2024 through December 31, 2024. Manually typing 366 dates would be time-consuming.
+
+What Excel feature allows populating a column with consecutive dates using a specified start and end date?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option correct ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">Fill Series with Type set to Date and a Stop value</span>
+                    <span class="option-length">50 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">Flash Fill with date pattern recognition enabled</span>
+                    <span class="option-length">48 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">AutoFill by dragging the cell corner down the column</span>
+                    <span class="option-length">52 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">SEQUENCE function with date formatting applied</span>
+                    <span class="option-length">46 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 1.2 / Chapter 1 Exercise)</div>
+                <div class="ref-content">&quot;More advanced Fill Series features allow you to select either rows or columns <br>  to fill, the type of data, and even the intervals between the values. For <br>  example, you can enter the date in the first cell of a new column and then use <br>  Fill Series to populate the whole column with weekdays up to your desired end date.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 6</span>
+                <h2 class="item-title">LEN Function for Data Quality</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A database administrator notices that some state abbreviation codes in the Customer State column appear to have extra spaces. All valid state codes should be exactly 2 characters.
+
+Which function would help identify cells containing invalid state codes with trailing spaces?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">TRIM() to automatically remove any unwanted space characters</span>
+                    <span class="option-length">60 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">FIND() to locate the position of spaces within each cell</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">LEN() to count characters and flag values not equal to 2</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">CLEAN() to remove non-printable characters from the data</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 2.1)</div>
+                <div class="ref-content">&quot;The LEN function allows you to count how many characters are in a text string, <br>  including the spaces and special characters. For data preparation, it is a great <br>  way to help you identify if there are trailing spaces in your cells or identify <br>  anomalies in the data.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 7</span>
+                <h2 class="item-title">TRIM Function for Cleaning Text</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">After checking the length of state abbreviation values, a data analyst confirms some cells contain trailing spaces (e.g., &quot;CA  &quot; instead of &quot;CA&quot;). The analyst needs to clean these values.
+
+Which function removes the extra spaces while keeping the text content intact?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">CLEAN() removes all whitespace characters from the text string</span>
+                    <span class="option-length">62 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">SUBSTITUTE() replaces specific characters with different values</span>
+                    <span class="option-length">63 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">TRIM() removes leading, trailing, and excess internal spaces</span>
+                    <span class="option-length">60 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">LEN() calculates the length of the text after spaces removed</span>
+                    <span class="option-length">60 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Chapter 2 Exercise)</div>
+                <div class="ref-content">&quot;Using the new column, remove all unwanted spaces from the values in <br>  Customer State. The function TRIM() will come in handy.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 8</span>
+                <h2 class="item-title">TEXTJOIN Function</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A logistics coordinator needs to create a full address column by combining Street, City, and Zip Code columns. Each component should be separated by a comma and space, and empty cells should still be included in the result.
+
+Which function accomplishes this with a specified delimiter?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">CONCAT() combines text and allows delimiter specification</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">TEXTJOIN() combines text with a specified delimiter option</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">CONCATENATE() merges cells with automatic comma separation</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">SUBSTITUTE() replaces cell references with combined text</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 2.1)</div>
+                <div class="ref-content">&quot;TEXTJOIN is similar to CONCAT. It combines text in the same way, but it also <br>  allows you to specify the delimiter of your choice between each value and <br>  include cells in the output if they are empty.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 9</span>
+                <h2 class="item-title">WEEKDAY Function</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A sales analyst wants to determine which day of the week each order was placed. The Order Date column contains dates, and the analyst needs a new column showing the weekday as a number (1 for Monday through 7 for Sunday).
+
+What formula extracts the weekday number with Monday as day 1?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=DAY(A2) returns the day portion of any date value</span>
+                    <span class="option-length">50 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=WEEKDAY(A2) returns weekday with Sunday as day one</span>
+                    <span class="option-length">51 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=WEEKDAY(A2,2) returns weekday with Monday as day one</span>
+                    <span class="option-length">53 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=DATEPART(A2,&quot;weekday&quot;) extracts the day component</span>
+                    <span class="option-length">50 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            <div class="length-warning-text">⚠️ Correct answer (53 chars) is longer than all distractors</div>
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 2.1 / Video 2.2)</div>
+                <div class="ref-content">&quot;Next is WEEKDAY, a function that will give you an integer for the day of the <br>  week based on an inputted date. You can adjust the start of the week so that <br>  your output suits your definition of a week. We will use Monday as the start <br>  of the week, so we will enter two for the second variable of the formula.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 10</span>
+                <h2 class="item-title">WORKDAY Function</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A shipping coordinator needs to calculate delivery dates based on the order date and the number of business days required for shipment. Deliveries only occur on weekdays, not weekends.
+
+Which function calculates a future date based on working days from a start date?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=DATE(A2+B2) adds the number of days to the start date</span>
+                    <span class="option-length">54 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=EDATE(A2,B2) adds a specified number of months to a date</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=NETWORKDAYS(A2,B2) counts working days between two dates</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=WORKDAY(A2,B2) returns the date after specified working days</span>
+                    <span class="option-length">61 chars</span>
+                    <span class="option-marker">✓</span>
+                </div></div>
+            <div class="length-warning-text">⚠️ Correct answer (61 chars) is longer than all distractors</div>
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 2.1 / Chapter 2 Exercise)</div>
+                <div class="ref-content">&quot;Finally, WORKDAY will help you calculate the date based on the number of <br>  working days before or after a starting date. You are also able to exclude <br>  holiday dates from the calculation. It is useful for project planning.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 11</span>
+                <h2 class="item-title">AND Function for Multiple Conditions</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A finance analyst needs to flag orders where the payment type is &quot;CASH&quot; and the order total exceeds $200. Both conditions must be true for the flag to show TRUE.
+
+Which function tests that both conditions are met simultaneously?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=OR(A2=&quot;CASH&quot;,B2&gt;200) returns TRUE if either condition is met</span>
+                    <span class="option-length">61 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=IF(A2=&quot;CASH&quot;,B2&gt;200) checks conditions in sequential order</span>
+                    <span class="option-length">59 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=AND(A2=&quot;CASH&quot;,B2&gt;200) returns TRUE only if both are true</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=NOT(A2=&quot;CASH&quot;,B2&gt;200) inverts the result of both conditions</span>
+                    <span class="option-length">60 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 3.1)</div>
+                <div class="ref-content">&quot;The AND function tests whether one or more conditions are true. If the <br>  logical tests are all true, the result is TRUE; otherwise, FALSE is returned.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 12</span>
+                <h2 class="item-title">NOT Function for Opposite Conditions</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A product manager wants to flag products priced at or below the average price. The average price is stored in cell H3. The manager considers testing if the price is greater than the average.
+
+How can the NOT function create a TRUE flag for products at or below average?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=NOT(E2=H3) returns TRUE when price does not equal average</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=NOT(E2&gt;H3,E2&lt;H3) tests multiple conditions simultaneously</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=NOT(E2&gt;$H$3) returns TRUE when price is not above average</span>
+                    <span class="option-length">58 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=NOT(E2) returns TRUE when the cell contains no value</span>
+                    <span class="option-length">53 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 3.1 / Video 3.2)</div>
+                <div class="ref-content">&quot;The NOT function is different as it only takes one logical argument. In <br>  addition, the function&#x27;s output will also be the opposite of the condition <br>  set. Excel will look if the outcome of the condition is TRUE or FALSE, <br>  and then give the opposite outcome.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 13</span>
+                <h2 class="item-title">IF with AND Combined</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">An operations analyst needs to categorize orders as &quot;Same Day - On Time&quot; when the shipping mode is &quot;Same Day&quot; AND the late delivery risk is 0. All other orders should be labeled &quot;Other&quot;.
+
+Which formula correctly combines IF and AND for this categorization?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=IF(E2=&quot;Same Day&quot;,F2=0,&quot;Same Day - On Time&quot;,&quot;Other&quot;)</span>
+                    <span class="option-length">52 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=AND(IF(E2=0,F2=&quot;Same Day&quot;),&quot;Same Day - On Time&quot;,&quot;Other&quot;)</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=IF(OR(E2=0,F2=&quot;Same Day&quot;),&quot;Same Day - On Time&quot;,&quot;Other&quot;)</span>
+                    <span class="option-length">56 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=IF(AND(E2=0,F2=&quot;Same Day&quot;),&quot;Same Day - On Time&quot;,&quot;Other&quot;)</span>
+                    <span class="option-length">57 chars</span>
+                    <span class="option-marker">✓</span>
+                </div></div>
+            
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 3.1 / Chapter 3 Exercise)</div>
+                <div class="ref-content">&quot;To do this in Excel, we can combine logical functions like AND, OR, and NOT <br>  with our IF function to create nested formulas that can test multiple conditions.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 14</span>
+                <h2 class="item-title">VLOOKUP Function</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">An analyst needs to pull product names from a Products sheet into the Orders sheet using the Product Id as the lookup value. The Products sheet has Product Id in column A and Product Name in column B.
+
+What formula retrieves the product name for the ID in cell T2?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">=VLOOKUP(T2,Products!A:B,1,FALSE) returns the first column value</span>
+                    <span class="option-length">64 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">=VLOOKUP(Products!A:B,T2,2,FALSE) places the table first in syntax</span>
+                    <span class="option-length">66 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">=VLOOKUP(T2,Products!A:B,2,TRUE) finds an approximate match value</span>
+                    <span class="option-length">65 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">=VLOOKUP(T2,Products!A:B,2,FALSE) returns exact match from column 2</span>
+                    <span class="option-length">67 chars</span>
+                    <span class="option-marker">✓</span>
+                </div></div>
+            <div class="length-warning-text">⚠️ Correct answer (67 chars) is longer than all distractors</div>
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 4.1)</div>
+                <div class="ref-content">&quot;VLOOKUP searches the data vertically, so across columns. The function requires <br>  a lookup_value, the table_array is where you will look for the value, and the <br>  col_index_num is the column number containing the value to return. The optional <br>  range_lookup is set to FALSE for an exact match.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 15</span>
+                <h2 class="item-title">PivotTable Creation and Use</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">MultipleChoiceChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">data-preparation-in-excel</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">data-preparation</span></div>
+            
+            <div class="section-label">📋 Stem (Assignment)</div>
+            <div class="stem-box">A sales manager creates a PivotTable showing total order quantities by market region. By default, the values show as &quot;Sum of Order Quantity&quot; but the manager needs to display the average instead.
+
+How does the manager change the aggregation method from Sum to Average?</div>
+            
+            <div class="section-label">🔘 Options <span class="length-status">✅ Lengths OK</span></div>
+            <div class="options-container">
+                <div class="option  ">
+                    <span class="option-num">1</span>
+                    <span class="option-text">Right-click the PivotTable and then select Change Summary Type</span>
+                    <span class="option-length">62 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">2</span>
+                    <span class="option-text">Edit the source data to calculate averages before the PivotTable</span>
+                    <span class="option-length">64 chars</span>
+                    <span class="option-marker"></span>
+                </div>
+                <div class="option correct ">
+                    <span class="option-num">3</span>
+                    <span class="option-text">Click the field dropdown in Values then select Value Field Settings</span>
+                    <span class="option-length">67 chars</span>
+                    <span class="option-marker">✓</span>
+                </div>
+                <div class="option  ">
+                    <span class="option-num">4</span>
+                    <span class="option-text">Use the PivotTable Design menu to then modify calculation options</span>
+                    <span class="option-length">65 chars</span>
+                    <span class="option-marker"></span>
+                </div></div>
+            <div class="length-warning-text">⚠️ Correct answer (67 chars) is longer than all distractors</div>
+            
+            <div class="section-label">📚 Course Alignment</div>
+            <div class="references-container">
+                
+            <div class="course-ref embedded-ref">
+                <div class="ref-header">📍 AI-Identified (Video 4.1 / Video 4.2)</div>
+                <div class="ref-content">&quot;We now have some values, but by default, the aggregation type is sum. To change <br>  this, click the down arrow next to the Sum of Price, then select Value Field <br>  Settings. Here we can choose which summarization method is applied.&quot;</div>
+            </div>
+            </div>
+            
+            <div class="section-label">🔍 Keyword Matches <span class="ref-note">(automated fallback)</span></div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 1: The data preparation journey (unit match)</div>
+                <div class="ref-content">`@lower_third`
+name: Iason Prassides
+title: Content Developer, DataCamp</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">🔍 Keyword Match: 📍 Chapter 3: Logical data preparation (unit match)</div>
+                <div class="ref-content">`@projector_key`
+429074acb74e0897ed091a4bdd254846</div>
+            </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

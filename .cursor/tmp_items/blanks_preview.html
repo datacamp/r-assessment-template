@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlanksChallenge Preview - Monitoring Machine Learning in Python Assessment Items (Coding)</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 {
+            color: #00d4aa;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #00d4aa;
+            padding-bottom: 0.5rem;
+        }
+        .pool-info {
+            background: rgba(0, 212, 170, 0.1);
+            border-left: 4px solid #00d4aa;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 8px 8px 0;
+        }
+        .pool-info code {
+            color: #00d4aa;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .item {
+            background: #1e2a3a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #2d3f52;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .item-number {
+            background: #00d4aa;
+            color: #1a1a2e;
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .item-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .yaml-block {
+            background: #0d1520;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2d3f52;
+            white-space: pre;
+        }
+        .yaml-key { color: #ff6b9d; }
+        .yaml-value { color: #a8e6cf; }
+        .section-label {
+            color: #7eb8da;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .context-box {
+            background: rgba(126, 184, 218, 0.1);
+            border-left: 3px solid #7eb8da;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: #0d1520;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border: 1px solid #2d3f52;
+            line-height: 1.5;
+            white-space: pre;
+        }
+        .blank {
+            background: #ff6b9d;
+            color: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .answer-highlight {
+            background: rgba(255, 107, 157, 0.3);
+            color: #ff6b9d;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            border: 1px solid #ff6b9d;
+        }
+        .variables-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .variables-grid.single-blank {
+            justify-content: center;
+        }
+        .variables-grid.single-blank .variable-chip {
+            min-width: 200px;
+        }
+        .variable-chip {
+            background: rgba(168, 230, 207, 0.15);
+            border: 1px solid #a8e6cf;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            max-width: 300px;
+        }
+        .variable-chip .var-name {
+            color: #ff6b9d;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .variable-chip .var-value {
+            color: #a8e6cf;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .references-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .course-ref {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+        }
+        .video-ref {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        .exercise-ref {
+            background: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+        }
+        .ref-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffc107;
+        }
+        .exercise-ref .ref-header {
+            color: #ce93d8;
+        }
+        .ref-content {
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .ref-code {
+            background: #0d1520;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            margin: 0.5rem 0 0 0;
+            color: #a8e6cf;
+        }
+        .no-refs {
+            color: #666;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 BlanksChallenge Preview</h1>
+        
+        <div class="pool-info">
+            <strong>Document:</strong> Monitoring Machine Learning in Python Assessment Items (Coding)<br>
+            <strong>Subskill:</strong> <code>chapter2</code>
+            <div class="stats">
+                <span>📝 6 items</span>
+                <span>🔲 8 total blanks</span>
+            </div>
+        </div>
+
+        
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 1</span>
+                <h2 class="item-title">Calculating realized performance</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">performance-calculation</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter2</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">Ground truth labels have arrived for your production data. Initialize the appropriate module to compute actual performance metrics and obtain results on the analysis set.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">calculator = nannyml.<span class="blank">{{_expr1}}</span>(
+    problem_type=&#x27;regression&#x27;,
+    y_pred=&#x27;y_pred&#x27;,
+    y_true=&#x27;tip_amount&#x27;,
+    metrics=[&#x27;mae&#x27;],
+    timestamp_column_name=&#x27;timestamp&#x27;,
+    chunk_period=&#x27;d&#x27;
+)
+calculator.fit(reference)
+results = calculator.<span class="blank">{{_expr2}}</span>(analysis)</div>
+            
+            <div class="section-label">✅ Answers (2 blanks)</div>
+            <div class="variables-grid">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'PerformanceCalculator'</div>
+                </div>
+                <div class="variable-chip">
+                    <div class="var-name">expr2</div>
+                    <div class="var-value">'calculate'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 1.3</div>
+                <div class="ref-content">&gt; Direct Loss Estimation, also known as DLE, is used for regression tasks. The idea behind DLE is to train an extra ML model to estimate the value of the loss function, which is the difference between the model&#x27;s predictions and the actual target values. Under the hood, NannyML uses the LGBM algorithm as an &quot;extra&quot; ML model. It is trained on the reference set and then fed with an analysis set in p...</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 2.1</div>
+                <div class="ref-content">Similar to the CBPE and DLE estimators, we fit the reference data, which is the test set used to evaluate the model before deploying it to production. However, in this case, we are not estimating the performance; instead, we are calculating it on the production data known as the analysis set. Also, since we are calculating the realized performance, the analysis set needs to include a column with t...</div>
+            </div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter2: When labels are available</div>
+                <pre class="ref-code"># Intialize the calculator
+calculator = nannyml.<span class="answer-highlight">PerformanceCalculator</span>(
+    y_true=&#x27;tip_amount&#x27;,
+    y_pred=&#x27;y_pred&#x27;,
+    chunk_period=&#x27;d&#x27;,
+  	metrics=[&#x27;mae&#x27;],
+    timestamp_column_name=&#x27;lpep_pickup_datetime&#x27;,
+    problem_type=&#x27;regression&#x27;)
+
+# Fit the calculator
+calculator.fit(reference)
+realized_results = calculator.<span class="answer-highlight">calculate</span>(analysis)
+
+# Show comparison plot for realized and estimated performance...</pre>
+            </div>
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter2: Business value calculation and estimation</div>
+                <pre class="ref-code"># Custom business value thresholds
+ct = ConstantThreshold(lower=0, upper=150000)
+# Intialize the performance calculator
+calc = <span class="answer-highlight">PerformanceCalculator</span>(problem_type=&#x27;classification_binary&#x27;,
+			y_pred_proba=&#x27;y_pred_proba&#x27;,
+  			timestamp_column_name=&quot;timestamp&quot;, 		
+  			y_pred=&#x27;y_pred&#x27;,
+  			y_true=&#x27;is_canceled&#x27;,
+            chunk_period=&#x27;m&#x27;,
+  			metrics=[&#x27;business_value&#x27;, &#x27;roc_auc&#x27;],
+  			business_v...</pre>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 2</span>
+                <h2 class="item-title">Initializing a CBPE estimator</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">performance-estimation</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter2</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">You&#x27;re monitoring a binary classifier without immediate labels. Initialize the appropriate estimator for classification performance estimation.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">estimator = nannyml.<span class="blank">{{_expr1}}</span>(
+    problem_type=&#x27;classification_binary&#x27;,
+    y_pred_proba=&#x27;predicted_probability&#x27;,
+    y_pred=&#x27;prediction&#x27;,
+    y_true=&#x27;employed&#x27;,
+    chunk_size=5000,
+    metrics=[&#x27;roc_auc&#x27;],
+)</div>
+            
+            <div class="section-label">✅ Answers (1 blank)</div>
+            <div class="variables-grid single-blank">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'CBPE'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 2.1</div>
+                <div class="ref-content">- When labels are available Welcome back! I&#x27;m Maciej, I&#x27;m a data scientist at NannyML, and I will be your instructor for this chapter. Previously, we explored the process of creating two essential sets for NannyML: The reference and analysis set. We also discussed how to estimate the performance of a tip prediction model without the ground truth.</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 1.3</div>
+                <div class="ref-content">&gt; Now, let&#x27;s take a look at <span class="answer-highlight">CBPE</span>, which is a method used for both binary and multiclass classification problems. It works by using the confidence scores of the model&#x27;s predictions. With these scores, <span class="answer-highlight">CBPE</span> estimates all the elements of the confusion matrix. This allows us to estimate various classification performance metrics such as accuracy, ROC AUC, F1 score, or precision. &gt; Now, let&#x27;s set up th...</div>
+            </div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter2: Working with calculated and estimated results</div>
+                <pre class="ref-code">reference, analysis, analysis_gt = nannyml.load_us_census_ma_employment_data()
+
+# Initialize the <span class="answer-highlight">CBPE</span> algorithm
+cbpe = nannyml.<span class="answer-highlight">CBPE</span>(
+    y_pred_proba=&#x27;predicted_probability&#x27;,
+    y_pred=&#x27;prediction&#x27;,
+    y_true=&#x27;employed&#x27;,
+    metrics = [&#x27;roc_auc&#x27;, &#x27;accuracy&#x27;],
+    problem_type = &#x27;classification_binary&#x27;,
+    chunk_size = 5000,
+)
+
+cbpe = cbpe.fit(reference)
+estimated_results = cbpe.estimate(analysi...</pre>
+            </div>
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter2: Modifying the thresholds</div>
+                <pre class="ref-code"># Import custom thresholds
+from nannyml.thresholds import StandardDeviationThreshold, ConstantThreshold
+
+# Initialize custom thresholds
+stdt = StandardDeviationThreshold(std_lower_multiplier=2, std_upper_multiplier=2)
+ct = ConstantThreshold(lower=0.9, upper=0.98)
+
+# Initialize the <span class="answer-highlight">CBPE</span> algorithm
+estimator = nannyml.<span class="answer-highlight">CBPE</span>(
+    problem_type=&#x27;classification_binary&#x27;,
+    y_pred_proba=&#x27;predicted_probabi...</pre>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 3</span>
+                <h2 class="item-title">Initializing a DLE estimator</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">performance-estimation</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter1</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">You&#x27;re estimating regression model performance without ground truth labels. Initialize the appropriate estimator and fit it to the reference data.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">estimator = nannyml.<span class="blank">{{_expr1}}</span>(
+    y_pred=&#x27;y_pred&#x27;,
+    y_true=&#x27;tip_amount&#x27;,
+    feature_column_names=features,
+    metrics=[&#x27;mse&#x27;],
+)
+estimator = estimator.<span class="blank">{{_expr2}}</span>(reference)</div>
+            
+            <div class="section-label">✅ Answers (2 blanks)</div>
+            <div class="variables-grid">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'DLE'</div>
+                </div>
+                <div class="variable-chip">
+                    <div class="var-name">expr2</div>
+                    <div class="var-value">'fit'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 1.3</div>
+                <div class="ref-content">&gt; Direct Loss Estimation, also known as <span class="answer-highlight">DLE</span>, is used for regression tasks. The idea behind <span class="answer-highlight">DLE</span> is to train an extra ML model to estimate the value of the loss function, which is the difference between the model&#x27;s predictions and the actual target values. Under the hood, NannyML uses the LGBM algorithm as an &quot;extra&quot; ML model. It is trained on the reference set and then fed with an analysis set in p...</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 2.1</div>
+                <div class="ref-content">&gt; In that scenario, the bookings can be made one week or a few months in advance, but the ground truth or labels are only accessible on the day of the arrival. This means that the model evaluation is delayed in time. For example, the IT department collects and shares the label data with the data science team every week on Monday.</div>
+            </div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter1: Performance estimation</div>
+                <pre class="ref-code">estimator = nannyml.<span class="answer-highlight">DLE</span>(y_pred=&#x27;y_pred&#x27;,
+    timestamp_column_name=&#x27;lpep_pickup_datetime&#x27;,
+    feature_column_names=features,
+    chunk_period=&#x27;d&#x27;,
+    y_true=&#x27;tip_amount&#x27;,
+    metrics=[&#x27;mse&#x27;])
+
+# Fit the reference data to the <span class="answer-highlight">DLE</span> algorithm
+estimator.<span class="answer-highlight">fit</span>(reference)
+
+# Estimate the performance on the analysis data
+results = estimator.estimate(analysis)
+
+# Plot and show the results
+results.plot().sh...</pre>
+            </div>
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter1: Creating reference and analysis set</div>
+                <pre class="ref-code">from lightgbm import LGBMRegressor
+
+# Fit the model
+model = LGBMRegressor(random_state=111, n_estimators=50, n_jobs=1)
+model.<span class="answer-highlight">fit</span>(X_train, y_train)
+
+# Make predictions
+y_pred_train = model.predict(X_train)
+y_pred_test = model.predict(X_test)
+
+# Deploy the model
+y_pred_prod = model.predict(X_prod)</pre>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 4</span>
+                <h2 class="item-title">Estimating performance on new data</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">performance-estimation</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter1</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">You&#x27;ve fit an estimator on a reference period and now want to estimate performance for the latest production period stored in `analysis`.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">results = estimator.<span class="blank">{{_expr1}}</span>(analysis)</div>
+            
+            <div class="section-label">✅ Answers (1 blank)</div>
+            <div class="variables-grid single-blank">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'estimate'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 2.1</div>
+                <div class="ref-content">Similar to the CBPE and DLE estimators, we fit the reference data, which is the test set used to evaluate the model before deploying it to production. However, in this case, we are not estimating the performance; instead, we are calculating it on the production data known as the analysis set. Also, since we are calculating the realized performance, the analysis set needs to include a column with t...</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 1.3</div>
+                <div class="ref-content">&gt; You might recall the two performance estimation algorithms also called estimators, CBPE or confidence-based performance estimation and DLE, or direct loss estimation from the previous course on monitoring machine learning models in production. If not, it&#x27;s okay we will do a quick recap but with some code implementations. &gt; Direct Loss Estimation, also known as DLE, is used for regression tasks. ...</div>
+            </div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter1: Performance estimation</div>
+                <pre class="ref-code">estimator = nannyml.DLE(y_pred=&#x27;y_pred&#x27;,
+    timestamp_column_name=&#x27;lpep_pickup_datetime&#x27;,
+    feature_column_names=features,
+    chunk_period=&#x27;d&#x27;,
+    y_true=&#x27;tip_amount&#x27;,
+    metrics=[&#x27;mse&#x27;])
+
+# Fit the reference data to the DLE algorithm
+estimator.fit(reference)
+
+# Estimate the performance on the analysis data
+results = estimator.<span class="answer-highlight">estimate</span>(analysis)
+
+# Plot and show the results
+results.plot().sh...</pre>
+            </div>
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter3: Issue resolution</div>
+                <pre class="ref-code"># Estimate the performance
+estimator.fit(reference)
+estimated_results = estimator.<span class="answer-highlight">estimate</span>(analysis)
+estimated_results.plot().show()</pre>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 5</span>
+                <h2 class="item-title">Narrowing results for a specific period</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">results-analysis</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter2</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">You&#x27;re exploring monitoring outputs. Narrow down results to the analysis period before visualizing or exporting them.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">analysis_results = estimated_results.<span class="blank">{{_expr1}}</span>(period=&#x27;analysis&#x27;)</div>
+            
+            <div class="section-label">✅ Answers (1 blank)</div>
+            <div class="variables-grid single-blank">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'filter'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                <div class="no-refs">No video references found</div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter3: Multivariate drift detection</div>
+                <pre class="ref-code"># Create standard deviation thresholds
+stdt = StandardDeviationThreshold(std_lower_multiplier=2, std_upper_multiplier=1)
+
+# Define feature columns
+feature_column_names = [&quot;country&quot;, &quot;lead_time&quot;, &quot;parking_spaces&quot;, &quot;hotel&quot;]
+
+# Intialize, fit, and show results of multivariate drift calculator
+mv_calc = nannyml.DataReconstructionDriftCalculator(
+    column_names=feature_column_names,
+	threshold = stdt...</pre>
+            </div>
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter3: Ranking the univariate results</div>
+                <pre class="ref-code"># Initialize the alert count ranker
+alert_count_ranker = nannyml.AlertCountRanker()
+alert_count_ranked_features = alert_count_ranker.rank(
+    uv_results.<span class="answer-highlight">filter</span>(methods=[&#x27;wasserstein&#x27;, &#x27;l_infinity&#x27;]))
+
+display(alert_count_ranked_features)</pre>
+            </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-number">Item 6</span>
+                <h2 class="item-title">Converting results to a DataFrame</h2>
+            </div>
+            
+            <div class="yaml-block"><span class="yaml-key">type:</span> <span class="yaml-value">BlanksChallenge</span>
+<span class="yaml-key">unit:</span> <span class="yaml-value">results-analysis</span>
+<span class="yaml-key">subskill:</span> <span class="yaml-value">chapter2</span></div>
+            
+            <div class="section-label">📋 Context</div>
+            <div class="context-box">You want to inspect estimated metrics as tabular data. Convert filtered results into a pandas-friendly format.</div>
+            
+            <div class="section-label">💻 Code</div>
+            <div class="code-block">df = estimated_results.filter(metrics=[&#x27;roc_auc&#x27;]).<span class="blank">{{_expr1}}</span>()
+print(df.head(3))</div>
+            
+            <div class="section-label">✅ Answers (1 blank)</div>
+            <div class="variables-grid single-blank">
+                <div class="variable-chip">
+                    <div class="var-name">expr1</div>
+                    <div class="var-value">'to_df'</div>
+                </div></div>
+            
+            <div class="section-label">📚 Course References</div>
+            <div class="references-container">
+                
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 2.2</div>
+                <div class="ref-content">&gt; NannyML has introduced a helpful method that enables us to filter the result data, making it easy to retrieve the specific information we&#x27;re interested in. We can filter by the reference and analysis periods, the metrics of interest, or by both criteria. &gt; We can use the to-df method to convert the results into a data frame. Let&#x27;s take a look at what our resulting DataFrame looks like.</div>
+            </div>
+            <div class="course-ref video-ref">
+                <div class="ref-header">📹 Video 3.2</div>
+                <div class="ref-content">&gt; Fortunately, we can filter the resulting plots. Besides the already mentioned period argument, we can filter by the column names and methods we have used. We can do it by using filter method on univariate results and specify column names and methods as an argument.</div>
+            </div>
+                
+            <div class="course-ref exercise-ref">
+                <div class="ref-header">📝 chapter2: Interacting with results</div>
+                <pre class="ref-code"># Filter estimated results for the roc_auc metric and convert them to a dataframe
+display(estimated_results.filter(metrics=[&#x27;roc_auc&#x27;]).<span class="answer-highlight">to_df</span>())
+
+# Filter estimated results for the reference period and convert them to a dataframe
+display(estimated_results.filter(period=&#x27;reference&#x27;).<span class="answer-highlight">to_df</span>())
+
+# Filter the estimated results for the accuracy metric
+display(estimated_results.filter(metrics=[&#x27;accuracy&#x27;...</pre>
+            </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

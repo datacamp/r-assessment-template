@@ -1,0 +1,67 @@
+# Assessment Project Configuration
+# Copy this file to project.yaml and configure for your workflow
+
+# Mode determines context structure and Cursor behavior
+# Options: chapter | track | standalone
+mode: chapter
+
+# ============================================
+# CHAPTER MODE - Single course assessments
+# ============================================
+# Use when creating assessments for a specific course chapter
+chapter:
+  # GitHub repo for the course (for reference)
+  course_repo: "datacamp-content/courses-your-course-name"
+  # Which chapters to work with
+  chapters: [1, 2, 3, 4]
+  # Context structure:
+  #   context/
+  #   ├── slides/
+  #   │   ├── chapter_1.md
+  #   │   └── chapter_2.md
+  #   └── exercises/
+  #       ├── chapter1.md
+  #       └── chapter2.md
+
+# ============================================
+# TRACK MODE - Multi-course track assessments
+# ============================================
+# Use when creating assessments spanning multiple courses in a track
+track:
+  track_name: "Python Fundamentals"
+  courses:
+    - name: "Intro to Python"
+      path: "context/intro_to_python/"
+    - name: "Intermediate Python"
+      path: "context/intermediate_python/"
+    - name: "Data Manipulation with pandas"
+      path: "context/data_manipulation_pandas/"
+  # Context structure:
+  #   context/
+  #   ├── intro_to_python/
+  #   │   ├── slides/
+  #   │   └── exercises/
+  #   ├── intermediate_python/
+  #   │   ├── slides/
+  #   │   └── exercises/
+  #   └── track_los.md
+
+# ============================================
+# STANDALONE MODE - Certification pools
+# ============================================
+# Use when creating items not tied to Learn content
+# Works for both new repos and adding to existing repos
+standalone:
+  pool_name: "Python Certification Pool"
+  # Where existing items live (for reference/deduplication)
+  reference_items: "context/existing_items/"
+  # Optional reference documentation
+  reference_docs: "context/reference_docs/"
+  # Context structure:
+  #   context/
+  #   ├── existing_items/
+  #   │   ├── pool_v1.md
+  #   │   └── pool_v2.md
+  #   ├── reference_docs/
+  #   │   └── topic_guide.md
+  #   └── item_coverage.md
