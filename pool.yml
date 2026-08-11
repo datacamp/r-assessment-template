@@ -1,4 +1,4 @@
 title: Template R Challenge
 programming_language: r
-from: 'r-base-prod:v2.0.1'
+from: 'r-base-prod:v3.0.0'
 type: "skill-assessment"
