@@ -63,7 +63,7 @@ it is the goal of practice exercises to
 - [ ] Is every BlanksChallenge suited for a typing exercise (i.e. does it contain sufficient information)?
 - [ ] Is the context (for coding exercises, if used) or assignment (for multiple choice questions) concise? These should not exceed 200 characters.
 - [ ] DataCamp values diversity; do you use diverse protagonists in your context (if any)? 
-- [ ] Does each exercise adhere to the [Practice style guidelines](https://instructor-support.datacamp.com/daily-practice/guidelines/practice-style-guidelines)?
+- [ ] Does each exercise adhere to the Practice style guidelines?
 
 ## Step 4: Create exercises for the remaining chapters on the Teach Editor
 Follow the content vision, guidelines and checklist outlined above.
